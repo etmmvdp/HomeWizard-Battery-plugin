@@ -8,6 +8,4 @@ To run it provide the ip of the battery and an user name as an argument.
 It asks the user to press enter after the battery has been put in token generation mode, by pressing the button above the led array.
 When a token is aquirred the script prints the token returned as well as device and user infornation.
 
-Please provide comments via github.
-
 ![Devices](devices.png)
