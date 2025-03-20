@@ -9,3 +9,5 @@ It asks the user to press enter after the battery has been put in token generati
 When a token is aquirred the script prints the token returned as well as device and user infornation.
 
 ![Devices](devices.png)
+
+Thanks to https://github.com/gettevan/HomeWizard-Wifi-p1-plugin which provided the basis of this plugin.
