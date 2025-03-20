@@ -1,7 +1,6 @@
 #!/bin/env python 
 import sys
 import requests
-import json
 
 requests.packages.urllib3.disable_warnings()
 
@@ -61,6 +60,3 @@ input("Press key on device, then press Enter to continue...")
 token = make_user_request(IP_ADDRESS, USER)
 check_device(IP_ADDRESS, token)
 check_users(IP_ADDRESS, token)
-
-
-

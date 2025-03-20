@@ -7,7 +7,7 @@
 """
 <plugin key="HomeWizardBattery" name="HomeWizard Battery" author="etmmvdp" version="0.0.1" externallink="https://www.homewizard.com/nl/plug-in-battery">
     <description>
-        
+
     </description>
     <params>
         <param field="Address" label="IP Address" width="250px" required="true" default="127.0.0.1" />
@@ -35,18 +35,19 @@
 </plugin>
 """
 
-import Domoticz
 import json
 import ssl
 import urllib
 import urllib.request
+
+import Domoticz
 
 class BasePlugin:
     #Plugin variables
     pluginInterval = 10     #in seconds
     dataInterval = 60       #in seconds
     dataIntervalCount = 0
-    
+
     #Homewizard battery variables
     energy_import_kwh = -1   # Number    The energy usage meter reading in kWh.
     energy_export_kwh = -1   # Number    The energy feed-in meter reading in kWh.
@@ -63,31 +64,31 @@ class BasePlugin:
     #Device ID's
     total_power_id = 150;
     power_id = 153
-    voltage_id = 154 
+    voltage_id = 154
     current_id = 155
     frequency_id = 156
-    state_of_charge_id = 157 
+    state_of_charge_id = 157
     cycles_id = 158
     efficiency_id = 159
 
-    
+
     def onStart(self):
         if Parameters["Mode6"] == "Debug":
             Domoticz.Debugging(1)
             DumpConfigToLog()
-        
+
         # If data interval between 10 sec. and 5 min.
         if 10 <= int(Parameters["Mode1"]) <= 300:
             self.dataInterval = int(Parameters["Mode1"])
         else:
             # If not, set to 60 sec.
             self.dataInterval = 60
-        
+
         # Start the heartbeat
         Domoticz.Heartbeat(self.pluginInterval)
-        
+
         return True
-        
+
     def onConnect(self, Status, Description):
         return True
 
@@ -102,7 +103,7 @@ class BasePlugin:
             self.state_of_charge_pct = int(Data.get('state_of_charge_pct', 0))
             self.cycles = int(Data.get('cycles', 0))
 
-            self.efficiency = int(100.0 * self.energy_export_kwh / self.energy_import_kwh) if self.energy_import_kwh != 0 else 0;
+            self.efficiency = int(100.0 * self.energy_export_kwh / self.energy_import_kwh) if self.energy_import_kwh != 0 else 0
 
             Domoticz.Debug(f"Read battery measurement from input {Data}")
 
@@ -110,9 +111,7 @@ class BasePlugin:
                 if self.total_power_id not in Devices:
                     Domoticz.Device(Name="Total Power", Unit=self.total_power_id, Type=250, Subtype=1).Create()
 
-                import_power = self.power_w if self.power_w >= 0 else 0
-                export_power = -1 * self.power_w if self.power_w < 0 else 0
-                UpdateDevice(self.total_power_id, 0, f"{self.energy_import_kwh:.3f};0.0;{self.energy_export_kwh:.3f};0.0;{import_power};{export_power}", True)
+                UpdateDevice(self.total_power_id, 0, f"{self.energy_import_kwh:.3f};0;{self.energy_export_kwh:.3f};0;0;0", True)
             except Exception as e:
                 Domoticz.Error(f"Failed to update device id {self.total_power_id}: {e}")
 
@@ -143,15 +142,15 @@ class BasePlugin:
 
             try:
                 if self.frequency_id not in Devices:
-                    Domoticz.Device(Name="Frequency", Unit=self.frequency_id, Type=113, Switchtype=3, Options={"ValueQuantity": "Frequency", "ValueUnits": "Hz"}).Create()
+                    Domoticz.Device(Name="Frequency", Unit=self.frequency_id, Type=243, Subtype=31, Options={"Custom": "1;Hz"}).Create()
 
                 UpdateDevice(self.frequency_id, 0, f"{self.frequency_hz}")
             except Exception as e:
                 Domoticz.Error(f"Failed to update device id {self.frequency_id}: {e}")
-             
+
             try:
                 if self.state_of_charge_id not in Devices:
-                    Domoticz.Device(Name="State of Charge", Unit=self.state_of_charge_id, Type=243, Subtype=6).Create()
+                    Domoticz.Device(Name="SOC", Unit=self.state_of_charge_id, Type=243, Subtype=6).Create()
 
                 UpdateDevice(self.state_of_charge_id, 0, f"{self.state_of_charge_pct}")
             except Exception as e:
@@ -159,7 +158,7 @@ class BasePlugin:
 
             try:
                 if self.cycles_id not in Devices:
-                    Domoticz.Device(Name="Cycles", Unit=self.cycles_id, Type=113, Switchtype=3, Options={"ValueQuantity": "Cycles", "ValueUnits": ""}).Create()
+                    Domoticz.Device(Name="Cycles", Unit=self.cycles_id, Type=243, Subtype=31, Options={"Custom": "1;cycles"}).Create()
 
                 UpdateDevice(self.cycles_id, 0, f"{self.cycles}")
             except Exception as e:
@@ -176,7 +175,7 @@ class BasePlugin:
         except Exception as e:
             Domoticz.Error(f"Error reading battery measurement from input {Data}: {e}")
         return True
-                    
+
     def onCommand(self, Unit, Command, Level, Hue):
         #Domoticz.Log("onCommand called for Unit " + str(Unit) + ": Parameter '" + str(Command) + "', Level: " + str(Level))
         return True
@@ -187,12 +186,12 @@ class BasePlugin:
 
     def onHeartbeat(self):
         self.dataIntervalCount += self.pluginInterval
-        
+
         #------- Collect data -------
         if self.dataIntervalCount >= self.dataInterval:
             self.dataIntervalCount = 0
             self.readMeter()
-        
+
         return
 
     def onDisconnect(self):
@@ -220,7 +219,6 @@ class BasePlugin:
                 self.onMessage(APIjson, "200", "")
         except Exception as e:
             Domoticz.Error(f"Failed to communicate with battery at {url}: {e}")
-            return False
 
 global _plugin
 _plugin = BasePlugin()
@@ -257,20 +255,6 @@ def onHeartbeat():
     global _plugin
     _plugin.onHeartbeat()
 
-# Generic helper functions
-def isNumber(s):
-    try:
-        float(s)
-        return True
-    except ValueError:
-        return False
-        
-def numStr(s):
-    try:
-        return int(float(s))
-    except:
-        return "0"
-
 def DumpConfigToLog():
     for x in Parameters:
         if Parameters[x] != "":
@@ -283,13 +267,11 @@ def DumpConfigToLog():
         Domoticz.Debug("Device nValue:    " + str(Devices[x].nValue))
         Domoticz.Debug("Device sValue:   '" + Devices[x].sValue + "'")
         Domoticz.Debug("Device LastLevel: " + str(Devices[x].LastLevel))
-    return
 
-def UpdateDevice(Unit, nValue, sValue, AlwaysUpdate=False, SignalLevel=12):    
-    # Make sure that the Domoticz device still exists (they can be deleted) before updating it 
+def UpdateDevice(Unit, nValue, sValue, AlwaysUpdate=False, SignalLevel=12):
+    # Make sure that the Domoticz device still exists (they can be deleted) before updating it
     if Unit in Devices:
         if Devices[Unit].nValue != nValue or Devices[Unit].sValue != sValue or AlwaysUpdate:
             Devices[Unit].Update(nValue=nValue, sValue=sValue, SignalLevel=SignalLevel)
             Domoticz.Debug(f"Update {nValue}, '{sValue}' ({Devices[Unit].Name})")
 
-    return
