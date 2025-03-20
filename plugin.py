@@ -51,14 +51,14 @@ class BasePlugin:
     energy_import_kwh = -1   # Number    The energy usage meter reading in kWh.
     energy_export_kwh = -1   # Number    The energy feed-in meter reading in kWh.
     power_w = -1             # Number    The total active usage in watt.
-    voltage_v = -1        # Number    The active voltage in volt.
+    voltage_v = -1           # Number    The active voltage in volt.
     current_a = -1           # Number    The active current in ampere.
     frequency_hz = -1        # Number    Line frequency in hertz.
     state_of_charge_pct = -1 # Number    The current state of charge in percent.
     cycles = -1              # Number    Number of battery cycles.
 
     # calculated values
-    sfficiency = -1         # energy_export_kwh/energy_import_kwh * 100 %
+    efficiency = -1         # energy_export_kwh/energy_import_kwh * 100 %
 
     #Device ID's
     total_power_id = 150;
