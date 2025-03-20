@@ -94,8 +94,8 @@ class BasePlugin:
 
     def onMessage(self, Data, Status, Extra):
         try:
-            self.energy_import_kwh = float(Data.get('energy_import_kwh', 0))
-            self.energy_export_kwh = float(Data.get('energy_export_kwh', 0))
+            self.energy_import_kwh = int(Data.get('energy_import_kwh', 0) * 1000)
+            self.energy_export_kwh = int(Data.get('energy_export_kwh', 0) * 1000)
             self.power_w = int(Data.get('power_w', 0))
             self.voltage_v = int(Data.get('voltage_v', 0))
             self.current_a = float(Data.get('current_a', 0))
@@ -111,7 +111,10 @@ class BasePlugin:
                 if self.total_power_id not in Devices:
                     Domoticz.Device(Name="Total Power", Unit=self.total_power_id, Type=250, Subtype=1).Create()
 
-                UpdateDevice(self.total_power_id, 0, f"{self.energy_import_kwh:.3f};0;{self.energy_export_kwh:.3f};0;0;0", True)
+                import_power_w = self.power_w if self.power_w >= 0 else 0
+                export_power_w = -1 * self.power_w if self.power_w < 0 else 0
+
+                UpdateDevice(self.total_power_id, 0, f"{self.energy_import_kwh};0;{self.energy_export_kwh};0;{import_power_w};{export_power_w}", True)
             except Exception as e:
                 Domoticz.Error(f"Failed to update device id {self.total_power_id}: {e}")
 
@@ -120,7 +123,7 @@ class BasePlugin:
                     Domoticz.Device(Name="Active Power", Unit=self.power_id, Type=243, Subtype=29).Create()
 
                 net_energy_kwh = self.energy_import_kwh - self.energy_export_kwh
-                UpdateDevice(self.power_id, 0, f"{self.power_w};{net_energy_kwh:.3f}", True)
+                UpdateDevice(self.power_id, 0, f"{self.power_w};{net_energy_kwh}", True)
             except Exception as e:
                 Domoticz.Error(f"Failed to update device id {self.power_id}: {e}")
 
