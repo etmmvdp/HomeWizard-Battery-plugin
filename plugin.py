@@ -104,7 +104,7 @@ class BasePlugin:
 
             self.efficiency = int(100.0 * self.energy_export_kwh / self.energy_import_kwh) if self.energy_import_kwh != 0 else 0;
 
-            Domoticz.Log(f"Read battery measurement from input {Data}")
+            Domoticz.Debug(f"Read battery measurement from input {Data}")
 
             try:
                 if self.total_power_id not in Devices:
