@@ -13,8 +13,8 @@
         <ul style="list-style-type:square">
             <li>The token needs to be created using the activate_user.py script. See the readme for details.</li>
             <li>The Extra P1 Device option, when set to yes, adds an additional device to provide for a combined
-                overview of total imported and exported meter values, as wel as current import and export power.<br/>
-                It is using the P1 device as that type provides these details combined into one device.</li>
+                overview of total imported and exported meter values, as wel as current import and export power usage.<br/>
+                It is a bit of a hacky solution to use the P1 device, but it nicely provides for these details combined into one device.</li>
         </ul>
     </description>
     <params>
@@ -33,7 +33,7 @@
                 <option label="5 minutes" value="300"/>
             </options>
         </param>
-        <param field="Mode7" label="Extra P1 Device" width="250px">
+        <param field="Mode3" label="Extra P1 Device" width="250px">
             <options>
                 <option label="Yes" value="Yes"/>
                 <option label="No" value="No" default="true"/>
@@ -61,7 +61,7 @@ class BasePlugin:
     pluginInterval = 10     #in seconds
     dataInterval = 60       #in seconds
     dataIntervalCount = 0
-    use_p1_meter = False
+    use_p1_device = False
 
     #Homewizard battery variables
     energy_import_kwh = -1   # Number    The energy usage meter reading in kWh.
@@ -92,7 +92,7 @@ class BasePlugin:
             Domoticz.Debugging(1)
             DumpConfigToLog()
 
-        self.use_p1_meter = Parameters.get("Mode7", "") == "Yes"
+        self.use_p1_device = Parameters.get("Mode3", "") == "Yes"
 
         # If data interval between 10 sec. and 5 min.
         if 10 <= int(Parameters["Mode1"]) <= 300:
@@ -124,7 +124,7 @@ class BasePlugin:
 
             Domoticz.Debug(f"Read battery measurement from input {Data}")
 
-            if self.use_p1_meter:
+            if self.use_p1_device:
                 try:
                     if self.total_power_id not in Devices:
                         Domoticz.Device(Name="Total Power", Unit=self.total_power_id, Type=250, Subtype=1).Create()
@@ -138,10 +138,10 @@ class BasePlugin:
 
             try:
                 if self.power_id not in Devices:
-                    Domoticz.Device(Name="Active Power", Unit=self.power_id, Type=243, Subtype=29).Create()
+                    Domoticz.Device(Name="Active Power", Unit=self.power_id, Type=243, Subtype=29, Switchtype=4).Create()
 
-                    net_energy_kwh = self.energy_import_kwh - self.energy_export_kwh
-                    UpdateDevice(self.power_id, 0, f"{self.power_w};{net_energy_kwh}", True)
+                net_energy_kwh = self.energy_import_kwh - self.energy_export_kwh
+                UpdateDevice(self.power_id, 0, f"{self.power_w};{net_energy_kwh}", True)
             except Exception as e:
                 Domoticz.Error(f"Failed to update device id {self.power_id}: {e}")
 
