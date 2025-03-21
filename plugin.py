@@ -7,7 +7,15 @@
 """
 <plugin key="HomeWizardBattery" name="HomeWizard Battery" author="etmmvdp" version="0.0.1" externallink="https://www.homewizard.com/nl/plug-in-battery">
     <description>
-
+        <h2>HomeWizard Battery Plugin</h2><br/>
+        This plugin provides several devices for the HomeWizard Battery.<br/>
+        Notes:
+        <ul style="list-style-type:square">
+            <li>The token needs to be created using the activate_user.py script. See the readme for details.</li>
+            <li>The Extra P1 Device option, when set to yes, adds an additional device to provide for a combined
+                overview of total imported and exported meter values, as wel as current import and export power.<br/>
+                It is using the P1 device as that type provides these details combined into one device.</li>
+        </ul>
     </description>
     <params>
         <param field="Address" label="IP Address" width="250px" required="true" default="127.0.0.1" />
@@ -23,6 +31,12 @@
                 <option label="3 minutes" value="180"/>
                 <option label="4 minutes" value="240"/>
                 <option label="5 minutes" value="300"/>
+            </options>
+        </param>
+        <param field="Mode7" label="Extra P1 Device" width="250px">
+            <options>
+                <option label="Yes" value="Yes"/>
+                <option label="No" value="No" default="true"/>
             </options>
         </param>
         <param field="Mode6" label="Debug" width="75px">
@@ -47,6 +61,7 @@ class BasePlugin:
     pluginInterval = 10     #in seconds
     dataInterval = 60       #in seconds
     dataIntervalCount = 0
+    use_p1_meter = False
 
     #Homewizard battery variables
     energy_import_kwh = -1   # Number    The energy usage meter reading in kWh.
@@ -62,7 +77,7 @@ class BasePlugin:
     efficiency = -1         # energy_export_kwh/energy_import_kwh * 100 %
 
     #Device ID's
-    total_power_id = 150;
+    total_power_id = 150
     power_id = 153
     voltage_id = 154
     current_id = 155
@@ -76,6 +91,8 @@ class BasePlugin:
         if Parameters["Mode6"] == "Debug":
             Domoticz.Debugging(1)
             DumpConfigToLog()
+
+        self.use_p1_meter = Parameters.get("Mode7", "") == "Yes"
 
         # If data interval between 10 sec. and 5 min.
         if 10 <= int(Parameters["Mode1"]) <= 300:
@@ -107,23 +124,24 @@ class BasePlugin:
 
             Domoticz.Debug(f"Read battery measurement from input {Data}")
 
-            try:
-                if self.total_power_id not in Devices:
-                    Domoticz.Device(Name="Total Power", Unit=self.total_power_id, Type=250, Subtype=1).Create()
-
-                import_power_w = self.power_w if self.power_w >= 0 else 0
-                export_power_w = -1 * self.power_w if self.power_w < 0 else 0
-
-                UpdateDevice(self.total_power_id, 0, f"{self.energy_import_kwh};0;{self.energy_export_kwh};0;{import_power_w};{export_power_w}", True)
-            except Exception as e:
-                Domoticz.Error(f"Failed to update device id {self.total_power_id}: {e}")
+            if self.use_p1_meter:
+                try:
+                    if self.total_power_id not in Devices:
+                        Domoticz.Device(Name="Total Power", Unit=self.total_power_id, Type=250, Subtype=1).Create()
+    
+                    import_power_w = self.power_w if self.power_w >= 0 else 0
+                    export_power_w = -1 * self.power_w if self.power_w < 0 else 0
+    
+                    UpdateDevice(self.total_power_id, 0, f"{self.energy_import_kwh};0;{self.energy_export_kwh};0;{import_power_w};{export_power_w}", True)
+                except Exception as e:
+                    Domoticz.Error(f"Failed to update device id {self.total_power_id}: {e}")
 
             try:
                 if self.power_id not in Devices:
                     Domoticz.Device(Name="Active Power", Unit=self.power_id, Type=243, Subtype=29).Create()
 
-                net_energy_kwh = self.energy_import_kwh - self.energy_export_kwh
-                UpdateDevice(self.power_id, 0, f"{self.power_w};{net_energy_kwh}", True)
+                    net_energy_kwh = self.energy_import_kwh - self.energy_export_kwh
+                    UpdateDevice(self.power_id, 0, f"{self.power_w};{net_energy_kwh}", True)
             except Exception as e:
                 Domoticz.Error(f"Failed to update device id {self.power_id}: {e}")
 
@@ -205,21 +223,21 @@ class BasePlugin:
         return True
 
     def readMeter(self):
-        try:
-            url = f"https://{Parameters['Address']}:{Parameters['Port']}/api/measurement"
-            headers = {
-                "Authorization": f"Bearer {Parameters['Mode2']}",
-                "X-Api-Version": 2
-            }
-            timeout = self.pluginInterval / 2
-            context = ssl.create_default_context()
-            context.check_hostname = False  # Disable host name checking
-            context.verify_mode = ssl.CERT_NONE  # Disable certificate verification
+        url = f"https://{Parameters['Address']}:{Parameters['Port']}/api/measurement"
+        headers = {
+            "Authorization": f"Bearer {Parameters['Mode2']}",
+            "X-Api-Version": 2
+        }
+        timeout = self.pluginInterval / 2
+        context = ssl.create_default_context()
+        context.check_hostname = False
+        context.verify_mode = ssl.CERT_NONE
 
+        try:
             req = urllib.request.Request(url, headers=headers)
             with urllib.request.urlopen(req, timeout=timeout, context=context) as response:
-                APIjson = json.loads(response.read().decode("utf-8"))
-                self.onMessage(APIjson, "200", "")
+                api_json = json.loads(response.read().decode("utf-8"))
+                self.onMessage(api_json, "200", "")
         except Exception as e:
             Domoticz.Error(f"Failed to communicate with battery at {url}: {e}")
 
