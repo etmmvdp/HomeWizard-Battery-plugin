@@ -1,3 +1,4 @@
+#!env python
 import sys
 
 from plugin import BasePlugin
