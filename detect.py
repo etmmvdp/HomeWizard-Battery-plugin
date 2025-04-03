@@ -12,7 +12,7 @@ class MyListener(ServiceListener):
     def add_service(self, zc: Zeroconf, type_: str, name: str) -> None:
         info = zc.get_service_info(type_, name)
         version = "v1" if "hwenergy" in name else "v2"
-        print(f"Device {info.properties.get("product_name".encode("ascii"), "unknown").decode('ascii')} " +
+        print(f"Device {info.properties.get('product_name'.encode('ascii'), 'unknown').decode('ascii')} " +
             f"with name {name} on api {version} available at ip {info.parsed_addresses(version=IPVersion.V4Only)}")
         # print(f"info is  {info}")
 
