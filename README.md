@@ -17,4 +17,4 @@ It should be active for about 2 minutes, while printing the changed state of the
 
 ![Devices](devices.png)
 
-Thanks to gettevan for https://github.com/gettevan/HomeWizard-Wifi-p1-plugin which served as the basis for this plugin.
+Thanks to Eraser3 for https://github.com/Eraser3/HomeWizard-Wifi-p1-plugin which served as the basis for this plugin.
