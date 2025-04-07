@@ -15,6 +15,8 @@ Press the enter key to stop the program.
 You may want to test the connection. Edit the ip and token in `test.py` and run it, also without command line options.
 It should be active for about 2 minutes, while printing the changed state of the battery devices every 10 seconds.
 
+Make sure to run 'pip install -r requirements' before running the above python scripts.
+
 ![Devices](devices.png)
 
 Thanks to Eraser3 for https://github.com/Eraser3/HomeWizard-Wifi-p1-plugin which served as the basis for this plugin.
