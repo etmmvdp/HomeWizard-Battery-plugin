@@ -2,11 +2,11 @@
 ## HomeWizard Battery Plugin
 ##
 ## Author:         etmmvdp
-## Version:        0.0.2
-## Last modified:  22-03-2025
+## Version:        0.0.3
+## Last modified:  09-04-2025
 ##
 """
-<plugin key="HomeWizardBattery" name="HomeWizard Battery" author="etmmvdp" version="0.0.1" externallink="https://www.homewizard.com/nl/plug-in-battery">
+<plugin key="HomeWizardBattery" name="HomeWizard Battery" author="etmmvdp" version="0.0.3" externallink="https://www.homewizard.com/nl/plug-in-battery">
     <description>
         <h2>HomeWizard Battery Plugin</h2><br/>
         This plugin provides several devices for the HomeWizard Battery.<br/>
