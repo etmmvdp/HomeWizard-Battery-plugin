@@ -1,4 +1,5 @@
 #!env python
+import logging
 from zeroconf import ServiceBrowser, ServiceListener, Zeroconf, IPVersion
 
 
@@ -17,13 +18,16 @@ class MyListener(ServiceListener):
         # print(f"info is  {info}")
 
 def main():
+    logging.basicConfig(level=logging.INFO)
+    logging.getLogger("zeroconf").setLevel(logging.INFO)
+
     zeroconf = Zeroconf()
     listener = MyListener()
     ServiceBrowser(zeroconf, "_homewizard._tcp.local.", listener)
     ServiceBrowser(zeroconf, "_hwenergy._tcp.local.", listener)
 
     try:
-        input("Press enter to exit...\n")
+        input("Waiting for zeroconf browser result. This can take up to 20 seconds. Press enter to exit...\n")
     finally:
         zeroconf.close()
 
