@@ -13,7 +13,7 @@ It should print the type of all HomeWizard devices on your network, along with t
 Press the enter key to stop the program.
 
 You may want to test the connection. Edit the ip and token in `test.py` and run it, also without command line options.
-It should be active for about 2 minutes, while printing the changed state of the battery devices every 10 seconds.
+It should be active for about 2 minutes, while printing the changed state of the battery device every 10 seconds.
 
 Notes:
 * Make sure to run `pip install -r requirements` before running the above python scripts.
