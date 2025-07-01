@@ -1,4 +1,3 @@
-#!env python
 ## HomeWizard Battery Plugin
 ##
 ## Author:         etmmvdp
