@@ -1,4 +1,4 @@
-#!env python
+#!env python3
 import sys
 
 from plugin import BasePlugin
