@@ -11,6 +11,7 @@ When a token is acquired successfully the script prints the token returned as we
 The ip of the battery (and p1) device can be found by running the `python3 detect.py` script with no command line options.
 It should print the type of all HomeWizard devices on your network, along with their ip address. 
 Press the enter key to stop the program.
+Note: Each time the battery receives a new ip address, the token must be renewed. To avoid having to generate tokens frequently, you may want to assign the battery a static ip address.
 
 You may want to test the connection. Edit the ip and token in `test.py` and run it, also without command line options.
 It should be active for about 2 minutes, while printing the changed state of the battery device every 10 seconds.
