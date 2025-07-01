@@ -8,7 +8,7 @@ To run it provide the ip of the battery and an username as an argument.
 It asks the user to press enter after the battery has been put in token generation mode, by touching the button above the LED array on the battery.
 When a token is acquired successfully the script prints the token returned as well as some device and user information.
 
-The ip of the battery (and p1) device can be found by running the `python detect.py` script with no command line options.
+The ip of the battery (and p1) device can be found by running the `python3 detect.py` script with no command line options.
 It should print the type of all HomeWizard devices on your network, along with their ip address. 
 Press the enter key to stop the program.
 
@@ -17,7 +17,7 @@ It should be active for about 2 minutes, while printing the changed state of the
 
 Notes:
 * Make sure to run `pip install -r requirements` before running the above python scripts.
-* On Macos the python commands may fail to run due to insufficient authorisation. Run `sudo python <command>` instead.
+* On Macos the python commands may fail to run due to insufficient authorisation. Run `sudo python3 <command>` instead.
 * Multiple batteries need to be configuredf with multiple hardware devices. To combine them, like for SOC or power consumption/return use a dummy device and the event system to accumulate values. An example is provided in the example ![dzEvent.lua](examples/dzEvent.lua) script.
 
 ![Devices](devices.png)
