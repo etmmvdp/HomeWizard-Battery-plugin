@@ -18,7 +18,7 @@ It should be active for about 2 minutes, while printing the changed state of the
 Notes:
 * Make sure to run `pip install -r requirements` before running the above python scripts.
 * On Macos the python commands may fail to run due to insufficient authorisation. Run `sudo python3 <command>` instead.
-* Multiple batteries need to be configuredf with multiple hardware devices. To combine them, like for SOC or power consumption/return use a dummy device and the event system to accumulate values. An example is provided in the example ![dzEvent.lua](examples/dzEvent.lua) script.
+* Multiple batteries need to be configuredf with multiple hardware devices. To combine them, like for SOC or power consumption/return use a dummy device and the event system to accumulate values. An example is provided with the ![dzEvent.lua](examples/dzEvent.lua) script in the examples directory.
 
 ![Devices](devices.png)
 
