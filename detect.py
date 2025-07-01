@@ -1,4 +1,4 @@
-#!env python
+#!env python3
 import logging
 from zeroconf import ServiceBrowser, ServiceListener, Zeroconf, IPVersion
 
