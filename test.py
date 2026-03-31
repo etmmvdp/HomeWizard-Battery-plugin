@@ -6,12 +6,12 @@ from plugin import BasePlugin
 from mock_domoticz import Domoticz, Parameters
 
 def main():
-    Parameters["Address"] = "192.168.1.18"
+    Parameters["Address"] = "192.168.X.X"
     Parameters["Port"] = 443
     Parameters["Mode1"] = 10
-    Parameters["Mode2"] = "F9AFAB2CEF1A999F55AFD72946E3E647"
+    Parameters["Mode2"] = "XXX"
     Parameters["Mode3"] = "Yes"
-    Parameters["Mode6"] = "Debug"
+    Parameters["Mode6"] = ""
 
     plugin = BasePlugin()
     Domoticz.runPlugin(plugin, 60)

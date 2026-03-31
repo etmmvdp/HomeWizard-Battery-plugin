@@ -60,6 +60,7 @@ except ImportError:
     from mock_domoticz import Domoticz, Parameters, Devices
 
 class BasePlugin:
+    debug = False
     #Plugin variables
     pluginInterval = 10     #in seconds
     dataInterval = 60       #in seconds
@@ -92,6 +93,7 @@ class BasePlugin:
 
     def onStart(self):
         if Parameters["Mode6"] == "Debug":
+            Domoticz.Debugging(1)
             _dump_config_to_log()
 
         self.use_p1_device = Parameters.get("Mode3", "") == "Yes"
@@ -113,6 +115,7 @@ class BasePlugin:
 
     def onMessage(self, Data, Status, Extra):
         try:
+            Domoticz.Debug(f"Read battery measurement from input {Data}")
             self.energy_import_kwh = int(Data.get('energy_import_kwh', 0) * 1000)
             self.energy_export_kwh = int(Data.get('energy_export_kwh', 0) * 1000)
             self.power_w = int(Data.get('power_w', 0))
@@ -123,8 +126,7 @@ class BasePlugin:
             self.cycles = int(Data.get('cycles', 0))
 
             self.efficiency = int(100.0 * self.energy_export_kwh / self.energy_import_kwh) if self.energy_import_kwh != 0 else 0
-
-            Domoticz.Debug(f"Read battery measurement from input {Data}")
+            Domoticz.Debug(f"Calculated efficiency: {self.efficiency} from import {self.energy_import_kwh} and export {self.energy_export_kwh}")
 
             if self.use_p1_device:
                 try:
@@ -191,7 +193,7 @@ class BasePlugin:
                 if self.efficiency_id not in Devices:
                     Domoticz.Device(Name="RTE", Unit=self.efficiency_id, Type=243, Subtype=6).Create()
 
-                _update_device(self.efficiency_id, 0, f"{self.efficiency}")
+                _update_device(self.efficiency_id, 0, f"{self.efficiency}", always_update=True)
             except Exception as e:
                 Domoticz.Error(f"Failed to update device id {self.efficiency_id}: {e}")
 

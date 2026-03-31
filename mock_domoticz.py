@@ -10,6 +10,7 @@
 
 class DomoticzMock:
     def __init__(self):
+        self.log_level = 0
         self.Units = []
         self.Devices = dict()
         self.heartbeat = 1
@@ -26,10 +27,11 @@ class DomoticzMock:
         print(s)
 
     def Debug(self, s):
-        print(s)
+        if self.log_level >= 1:
+            print(s)
 
-    def Debugging(self, s):
-        print(s)
+    def Debugging(self, i):
+        self.log_level = i;
 
     def Heartbeat(self, heartbeat):
         self.heartbeat = heartbeat
